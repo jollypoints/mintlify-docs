@@ -7114,6 +7114,42 @@
           "Surveys",
           "Survey Responses"
         ]
+      },
+      "delete": {
+        "description": "Soft-deletes the survey, its SurveyAgent links, and sets all linked campaigns to inactive.",
+        "operationId": "SurveyController_deleteSurvey",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Survey ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Survey deleted"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Survey not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a survey",
+        "tags": [
+          "Surveys",
+          "Survey Responses"
+        ]
       }
     },
     "/backend/surveys/{id}/answers": {
@@ -7166,6 +7202,17 @@
             "in": "query",
             "description": "Filter end date",
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "agentId",
+            "required": false,
+            "in": "query",
+            "description": "Filter responses by campaign (organization agent) ID",
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
               "type": "string"
             }
           },
@@ -7330,6 +7377,17 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "surveyId",
+            "required": false,
+            "in": "query",
+            "description": "Filter export by survey ID",
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -7418,6 +7476,17 @@
             "in": "query",
             "description": "Filter end date",
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "agentId",
+            "required": false,
+            "in": "query",
+            "description": "Filter responses by campaign (organization agent) ID",
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
               "type": "string"
             }
           },
@@ -12512,12 +12581,25 @@
             "maxLength": 30
           },
           "foundryConfig": {
-            "description": "Palantir Foundry destination specifying RID of project & the data configurations i.e what not to send to Foundry",
-            "type": "object",
-            "propertyNames": {
-              "type": "string"
-            },
-            "additionalProperties": {}
+            "description": "Per-org instance of provider datasets: array of {rid, dataset_type} populated by the Foundry consumer after dataset creation. Empty array on a fresh connection.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rid": {
+                  "description": "Foundry dataset RID",
+                  "type": "string"
+                },
+                "dataset_type": {
+                  "description": "Logical dataset name within this provider (e.g. \"contacts\", \"visits\", \"email\")",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "rid",
+                "dataset_type"
+              ]
+            }
           },
           "createdAt": {
             "description": "The date and time when the organization datasource was created",
@@ -12714,11 +12796,24 @@
             "additionalProperties": {}
           },
           "foundryConfig": {
-            "type": "object",
-            "propertyNames": {
-              "type": "string"
-            },
-            "additionalProperties": {}
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rid": {
+                  "description": "Foundry dataset RID",
+                  "type": "string"
+                },
+                "dataset_type": {
+                  "description": "Logical dataset name within this provider (e.g. \"contacts\", \"visits\", \"email\")",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "rid",
+                "dataset_type"
+              ]
+            }
           },
           "lastSyncAt": {
             "type": "string",
@@ -25420,14 +25515,27 @@
             "additionalProperties": {}
           },
           "foundryConfig": {
-            "description": "The data that foundry's Connect API will need in order to function / necessary foundry elements",
+            "description": "Provider template: array of {rid, dataset_type} declaring the datasets this provider produces. Template entries carry empty rid strings; the org-instance fills them in.",
             "anyOf": [
               {
-                "type": "object",
-                "propertyNames": {
-                  "type": "string"
-                },
-                "additionalProperties": {}
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rid": {
+                      "description": "Foundry dataset RID",
+                      "type": "string"
+                    },
+                    "dataset_type": {
+                      "description": "Logical dataset name within this provider (e.g. \"contacts\", \"visits\", \"email\")",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "rid",
+                    "dataset_type"
+                  ]
+                }
               },
               {
                 "type": "null"
