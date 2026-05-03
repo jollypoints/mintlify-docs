@@ -1796,6 +1796,26 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "withContactNames",
+            "required": false,
+            "in": "query",
+            "description": "If true, include each contact's display name in the contacts array",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                }
+              ]
+            }
           }
         ],
         "responses": {
@@ -12075,6 +12095,9 @@
               "properties": {
                 "id": {
                   "type": "string"
+                },
+                "fullName": {
+                  "type": "string"
                 }
               },
               "required": [
@@ -12268,6 +12291,9 @@
                     "type": "object",
                     "properties": {
                       "id": {
+                        "type": "string"
+                      },
+                      "fullName": {
                         "type": "string"
                       }
                     },
