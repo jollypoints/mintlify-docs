@@ -13941,6 +13941,9 @@
           "orgId": {
             "type": "string"
           },
+          "slug": {
+            "type": "string"
+          },
           "contactFieldValues": {
             "type": "array",
             "items": {
@@ -13991,7 +13994,8 @@
           "visibility",
           "isGroup",
           "id",
-          "orgId"
+          "orgId",
+          "slug"
         ]
       },
       "UpdateContactFieldDto": {
@@ -21781,8 +21785,15 @@
                   "type": "string"
                 },
                 "ownerId": {
-                  "description": "Owner user ID",
-                  "type": "string"
+                  "description": "Owner user ID. Stripped (null) when the survey is anonymous to prevent admins from correlating responses to individuals.",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "surveyId": {
                   "description": "Survey ID",
@@ -21866,147 +21877,154 @@
                   ]
                 },
                 "owner": {
-                  "description": "User who owns this response",
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "description": "User ID",
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-7[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$"
-                    },
-                    "createdAt": {
-                      "description": "Creation timestamp",
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
-                    },
-                    "updatedAt": {
-                      "description": "Last update timestamp",
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
-                    },
-                    "deletedAt": {
-                      "description": "Soft delete timestamp",
-                      "anyOf": [
-                        {
+                  "description": "User who owns this response. Stripped (null) when the survey is anonymous.",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "description": "User ID",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-7[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$"
+                        },
+                        "createdAt": {
+                          "description": "Creation timestamp",
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                         },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "type": {
-                      "description": "Identity type",
-                      "type": "string",
-                      "enum": [
-                        "Organization",
-                        "User",
-                        "GenericIdentity"
-                      ]
-                    },
-                    "slug": {
-                      "description": "Unique slug",
-                      "type": "string"
-                    },
-                    "metadata": {
-                      "description": "User metadata (JSON)"
-                    },
-                    "firstName": {
-                      "description": "First name",
-                      "type": "string"
-                    },
-                    "lastName": {
-                      "description": "Last name",
-                      "type": "string"
-                    },
-                    "fullName": {
-                      "description": "Full name",
-                      "type": "string"
-                    },
-                    "birthday": {
-                      "description": "Birthday",
-                      "anyOf": [
-                        {
+                        "updatedAt": {
+                          "description": "Last update timestamp",
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                         },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "externalId": {
-                      "description": "External identity id (e.g. Clerk)",
-                      "type": "string"
-                    },
-                    "externalProvider": {
-                      "description": "External provider name",
-                      "type": "string"
-                    },
-                    "phone": {
-                      "description": "Phone number",
-                      "type": "string"
-                    },
-                    "email": {
-                      "description": "Email address",
-                      "type": "string",
-                      "format": "email",
-                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
-                    },
-                    "stripeCustomerId": {
-                      "description": "Stripe customer id",
-                      "anyOf": [
-                        {
+                        "deletedAt": {
+                          "description": "Soft delete timestamp",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "type": {
+                          "description": "Identity type",
+                          "type": "string",
+                          "enum": [
+                            "Organization",
+                            "User",
+                            "GenericIdentity"
+                          ]
+                        },
+                        "slug": {
+                          "description": "Unique slug",
                           "type": "string"
                         },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "locale": {
-                      "description": "Locale",
-                      "anyOf": [
-                        {
+                        "metadata": {
+                          "description": "User metadata (JSON)"
+                        },
+                        "firstName": {
+                          "description": "First name",
                           "type": "string"
                         },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "timezone": {
-                      "description": "IANA timezone",
-                      "anyOf": [
-                        {
+                        "lastName": {
+                          "description": "Last name",
                           "type": "string"
                         },
-                        {
-                          "type": "null"
+                        "fullName": {
+                          "description": "Full name",
+                          "type": "string"
+                        },
+                        "birthday": {
+                          "description": "Birthday",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "externalId": {
+                          "description": "External identity id (e.g. Clerk)",
+                          "type": "string"
+                        },
+                        "externalProvider": {
+                          "description": "External provider name",
+                          "type": "string"
+                        },
+                        "phone": {
+                          "description": "Phone number",
+                          "type": "string"
+                        },
+                        "email": {
+                          "description": "Email address",
+                          "type": "string",
+                          "format": "email",
+                          "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                        },
+                        "stripeCustomerId": {
+                          "description": "Stripe customer id",
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "locale": {
+                          "description": "Locale",
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "timezone": {
+                          "description": "IANA timezone",
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
+                      },
+                      "required": [
+                        "id",
+                        "createdAt",
+                        "updatedAt",
+                        "type",
+                        "slug",
+                        "metadata",
+                        "firstName",
+                        "lastName",
+                        "fullName",
+                        "externalId",
+                        "externalProvider",
+                        "phone",
+                        "email"
                       ]
+                    },
+                    {
+                      "type": "null"
                     }
-                  },
-                  "required": [
-                    "id",
-                    "createdAt",
-                    "updatedAt",
-                    "type",
-                    "slug",
-                    "metadata",
-                    "firstName",
-                    "lastName",
-                    "fullName",
-                    "externalId",
-                    "externalProvider",
-                    "phone",
-                    "email"
                   ]
                 },
                 "agent": {
@@ -22261,14 +22279,12 @@
                 "createdAt",
                 "updatedAt",
                 "orgId",
-                "ownerId",
                 "surveyId",
                 "answers",
                 "answeredAt",
                 "pointsGranted",
                 "isFinished",
-                "isAnonymous",
-                "owner"
+                "isAnonymous"
               ]
             }
           },
